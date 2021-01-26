@@ -1,0 +1,49 @@
+//Title: mn_momen.root
+//Author: Matthew Nicholson, Warwick.
+{
+TFile* my_file = TFile::Open("B5_mu.root");
+TTree* my_tree = (TTree*) my_file->Get("B5");
+
+TGraphErrors* tg1 = new TGraphErrors();
+TGraphErrors* tg2 = new TGraphErrors();
+
+std::vector<double>* vx1;
+std::vector<double>* vz1;
+std::vector<double>* vx2;
+std::vector<double>* vz2;
+
+my_tree->SetBranchAddress("Dc1HitsVector_x", &vx1);
+my_tree->SetBranchAddress("Dc1HitsVector_z", &vz1);
+my_tree->SetBranchAddress("Dc2HitsVector_x", &vx2);
+my_tree->SetBranchAddress("Dc2HitsVector_z", &vz2);
+
+for (int i = 0; i < my_tree->GetEntries(); ++i){
+my_tree->GetEntry(i);
+}
+
+for (int j = 0; j < vx1->size(); ++j){
+    tg1->SetPoint(j, vz1->at(j), vx1->at(j));
+    tg2->SetPoint(j, vz2->at(j), vx2->at(j));
+
+}
+
+TF1* f1 = new TF1("f1", "[0]*x+[1]", 1, 4);
+tg1->Fit("f1", "R");
+TF1* f2 = new TF1("f2", "[0]*x+[1]", 1, 4);
+tg2->Fit("f2", "R");
+
+
+
+tg1->SetTitle("Trajectory in DC1;z;x");
+tg1->GetYaxis()->SetRangeUser(-5,5);
+tg2->SetTitle("Trajectory in DC2;z;x");
+
+
+TCanvas* c2 = new TCanvas("c2", "c2", 3000, 1000);
+c2->Divide(2,1);
+c2->cd(1);
+tg1->Draw();
+c2->cd(2);
+tg2->Draw();
+
+}

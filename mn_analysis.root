@@ -1,0 +1,25 @@
+//Title: mn_analysis.root
+//Author: Matthew Nicholson, Warwick.
+
+{
+double Val1;
+double Val2;
+TVectorD Val3;
+
+TH1D *h1= new TH1D("h1","h1",100,0,1000);
+TH1D *h2= new TH1D("h2","h2",100,0,1000);
+
+TFile *myfile= TFile::Open("B5_mu.root");
+TTree *tree= (TTree*) myfile->Get("B5");
+tree->SetBranchAddress("HCEnergy", &Val1);
+tree->SetBranchAddress("ECEnergy", &Val2);
+
+for (int i=0; i<tree->GetEntries(); i++)
+{
+tree->GetEntry(i);
+h1->Fill(Val1);
+h2->Fill(Val2);
+
+h1->SetTitle("1000 muons at 100Gev; Energy (Gev); Number of events per 10Gev");
+}
+}
